@@ -24,6 +24,7 @@ import com.apps.rodolphe.cameranotes.R;
 import com.apps.rodolphe.cameranotes.activities.CameraActivity;
 import com.apps.rodolphe.cameranotes.database.Path;
 import com.apps.rodolphe.cameranotes.database.PathsDataSource;
+import com.apps.rodolphe.cameranotes.other.CameraInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,10 +35,10 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlaceholderFragment extends BaseFragment implements Button.OnClickListener  {
+public class PlaceholderFragment extends BaseFragment implements Button.OnClickListener, CameraInterface {
 
     CameraActivity activity;
-
+    int rowPosition;
     ListView lv;
     private PathsDataSource datasource;
     List<Path> values;
@@ -95,7 +96,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         values = datasource.getAllPaths();
 
         final ArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-                R.layout.row_layout, values,activity);
+                R.layout.row_layout, values,activity,this);
         lv.setAdapter(adapter);
 
 
@@ -129,8 +130,9 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
     /**
      * Start the camera by dispatching a camera intent.
      */
-    public void dispatchTakePictureIntent() {
+    public void dispatchTakePictureIntent(int request, int pos) {
 
+        this.rowPosition = pos;
         // Check if there is a camera.
         Context context = getActivity();
         PackageManager packageManager = context.getPackageManager();
@@ -142,6 +144,8 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
 
         // Camera exists? Then proceed...
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+
 
         // Ensure that there's a camera activity to handle the intent
 
@@ -163,7 +167,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
                 activity.setCurrentPhotoPath(fileUri.getPath());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         activity.getCapturedImageURI());
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, request);
             }
         }
     }
@@ -192,7 +196,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
             values = datasource.getAllPaths();
 
             final ArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-                    R.layout.row_layout, values,activity);
+                    R.layout.row_layout, values,activity,this);
             lv.setAdapter(adapter);
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -217,7 +221,9 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mImageView);
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mThumbnailImageView);
             // add to database
-            datasource.createShape(activity.getCurrentPhotoPath(),1);
+
+
+            datasource.createShape(activity.getCurrentPhotoPath(),rowPosition);
 
             values = datasource.getAllPaths();
 
@@ -236,7 +242,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
      * @return
      * @throws IOException
      */
-    protected File createImageFile() throws IOException {
+    public File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -259,7 +265,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
      * Must be called on all camera images or they will
      * disappear once taken.
      */
-    protected void addPhotoToGallery() {
+    public void addPhotoToGallery() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 
         File f = new File(activity.getCurrentPhotoPath());
@@ -274,7 +280,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
      */
     @Override
     public void onClick(View v) {
-        dispatchTakePictureIntent();
+        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO, -1);
     }
 
 
