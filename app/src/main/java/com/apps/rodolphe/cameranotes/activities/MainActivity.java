@@ -1,5 +1,7 @@
 package com.apps.rodolphe.cameranotes.activities;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -7,7 +9,10 @@ import android.view.MenuItem;
 
 import com.apps.rodolphe.cameranotes.R;
 import com.apps.rodolphe.cameranotes.fragments.BaseFragment;
+import com.apps.rodolphe.cameranotes.fragments.PictureFragment;
 import com.apps.rodolphe.cameranotes.fragments.PlaceholderFragment;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 
 public class MainActivity extends CameraActivity implements  BaseFragment.OnFragmentInteractionListener {
@@ -17,6 +22,12 @@ public class MainActivity extends CameraActivity implements  BaseFragment.OnFrag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+
+        .build();
+
+
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -24,6 +35,8 @@ public class MainActivity extends CameraActivity implements  BaseFragment.OnFrag
                     .commit();
         }
 
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imageLoader.init(ImageLoaderConfiguration.createDefault(this));
 
     }
 
@@ -74,6 +87,22 @@ public class MainActivity extends CameraActivity implements  BaseFragment.OnFrag
     @Override
     public void onFragmentInteraction(int actionId) {
 
+    }
+    @Override
+    public void onFragmentInteractionReplace(String value) {
+
+
+        // get fragment manager
+        FragmentManager fm = getFragmentManager();
+        Bundle bundle = new Bundle();
+        bundle.putString("path",value );
+        PictureFragment frag = new PictureFragment();
+        frag.setArguments(bundle);
+        // replace
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out, android.R.animator.fade_in, android.R.animator.fade_out);
+        ft.replace(R.id.container, frag).addToBackStack("fragBack");
+        ft.commit();
     }
 
 

@@ -19,14 +19,25 @@ android:layout_height="wrap_content">
         android:layout_width="90dp"
         android:id="@+id/rowpic" />
 
-    <TextView
-        android:id="@+id/rowtext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="italic"
-        android:padding="30sp"
+    <ImageView
+        android:layout_height="90dp"
+        android:layout_width="90dp"
+        android:id="@+id/shape" />
+
+    <ImageButton
+        android:textSize="35sp"
+        android:id="@+id/rowbutton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_width="90dp"
+        android:layout_height="fill_parent"
+        style="?android:attr/borderlessButtonStyle"
+        android:src="@drawable/add"
+        android:background="@drawable/flat_button"
+        android:scaleType="fitCenter"
         />
+
+
 
 </LinearLayout>
 

@@ -4,6 +4,7 @@
     <color name="card_white">#ffffffff</color>
     <color name="card_shadow">#8c666666</color>
 
+    <color name="primary_light">#BDBDBD</color>
     <color name="primary">#9E9E9E</color>
     <color name="primary_dark">#9E9E9E</color>
     <color name="accent">#8c232323</color>

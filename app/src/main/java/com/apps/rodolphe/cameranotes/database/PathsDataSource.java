@@ -16,7 +16,7 @@ public class PathsDataSource {
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
     private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
-            MySQLiteHelper.COLUMN_PATH };
+            MySQLiteHelper.COLUMN_PATH, MySQLiteHelper.COLUMN_SHAPE };
 
     public PathsDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -33,7 +33,7 @@ public class PathsDataSource {
     public Path createPath(String path) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_PATH, path);
-        long insertId = database.insert(MySQLiteHelper.TABLE_PATHS, null,
+        long insertId = database.insert(MySQLiteHelper.TABLE_PATHS,null,
                 values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_PATHS,
                 allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null,
@@ -42,6 +42,12 @@ public class PathsDataSource {
         Path newPath = cursorToPath(cursor);
         cursor.close();
         return newPath;
+    }
+
+    public void createShape(String shape, int id) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_SHAPE, shape);
+        long rowAffected = database.update(MySQLiteHelper.TABLE_PATHS, values, "_id = '" + id + "'",null );
     }
 
     public void deletePath(Path path) {
@@ -72,6 +78,9 @@ public class PathsDataSource {
         Path path = new Path();
         path.setId(cursor.getLong(0));
         path.setPath(cursor.getString(1));
+       if(!cursor.isNull(2)) {
+           path.setShape(cursor.getString(2));
+       }
         return path;
     }
 } 

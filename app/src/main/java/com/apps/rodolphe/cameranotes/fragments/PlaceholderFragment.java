@@ -1,17 +1,14 @@
 package com.apps.rodolphe.cameranotes.fragments;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +36,11 @@ import java.util.List;
  */
 public class PlaceholderFragment extends BaseFragment implements Button.OnClickListener  {
 
+    CameraActivity activity;
+
     ListView lv;
     private PathsDataSource datasource;
+    List<Path> values;
 
     // Activity result key for camera
     static final int REQUEST_TAKE_PHOTO = 11111;
@@ -49,14 +49,37 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
     private ImageView mImageView;
     private ImageView mThumbnailImageView;
 
+    OnFragmentInteractionListener mCallback;
+
+
 
     public PlaceholderFragment() {
         super();
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.e("ONCREATEVIEW","");
+
+        activity = (CameraActivity) getActivity();
 
         datasource = new PathsDataSource(getActivity());
         datasource.open();
@@ -66,14 +89,13 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         lv = (ListView) rootView.findViewById(R.id.apps_fragment_list);
         ImageButton takePictureButton = (ImageButton) rootView.findViewById(R.id.button1);
 
-
         // Set OnItemClickListener so we can be notified on button clicks
         takePictureButton.setOnClickListener(this);
 
-        List<Path> values = datasource.getAllPaths();
+        values = datasource.getAllPaths();
 
         final ArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-                R.layout.row_layout, values);
+                R.layout.row_layout, values,activity);
         lv.setAdapter(adapter);
 
 
@@ -82,14 +104,11 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
-                // get fragment manager
-                FragmentManager fm = getFragmentManager();
 
-                // replace
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.setCustomAnimations(R.anim.frag2_in, R.anim.frag1_out, R.anim.frag1_in, R.anim.frag2_out);
-                ft.replace(R.id.container, new PictureFragment()).addToBackStack("fragBack");
-                ft.commit();
+                Log.e("values.get(0)",values.get(0).getPath());
+                mCallback.onFragmentInteractionReplace(values.get(position).getPath());
+
+
             }
 
         });
@@ -110,7 +129,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
     /**
      * Start the camera by dispatching a camera intent.
      */
-    protected void dispatchTakePictureIntent() {
+    public void dispatchTakePictureIntent() {
 
         // Check if there is a camera.
         Context context = getActivity();
@@ -125,7 +144,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         // Ensure that there's a camera activity to handle the intent
-        CameraActivity activity = (CameraActivity) getActivity();
+
         if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
             // Create the File where the photo should go.
             // If you don't do this, you may get a crash in some devices.
@@ -157,9 +176,12 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Toast.makeText(getActivity(),"dans acivityresult du fragment",Toast.LENGTH_LONG);
+
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             addPhotoToGallery();
-            CameraActivity activity = (CameraActivity)getActivity();
+
 
             // Show the full sized image.
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mImageView);
@@ -167,18 +189,46 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
             // add to database
             datasource.createPath(activity.getCurrentPhotoPath());
 
-            List<Path> values = datasource.getAllPaths();
+            values = datasource.getAllPaths();
 
             final ArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-                    R.layout.row_layout, values);
+                    R.layout.row_layout, values,activity);
             lv.setAdapter(adapter);
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        } else {
+                @Override
+                public void onItemClick(AdapterView<?> parent, final View view,
+                                        int position, long id) {
+
+                    Log.e("values.get(0)",values.get(0).getPath());
+                    mCallback.onFragmentInteractionReplace(values.get(position).getPath());
+
+
+                }
+
+            });
+
+
+        } else if (requestCode == 22222 && resultCode == Activity.RESULT_OK) {
+            addPhotoToGallery();
+
+            Log.e("FRAGMENT","INSIDE ONACTIVITYRESULT");
+            // Show the full sized image.
+            //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mImageView);
+            //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mThumbnailImageView);
+            // add to database
+            datasource.createShape(activity.getCurrentPhotoPath(),1);
+
+            values = datasource.getAllPaths();
+
+
+
+
+        }
+        else {
             Toast.makeText(getActivity(), "Image Capture Failed", Toast.LENGTH_SHORT)
                     .show();
         }
-
-
     }
 
     /**
@@ -199,7 +249,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        CameraActivity activity = (CameraActivity)getActivity();
+
         activity.setCurrentPhotoPath("file:" + image.getAbsolutePath());
         return image;
     }
@@ -211,7 +261,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
      */
     protected void addPhotoToGallery() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        CameraActivity activity = (CameraActivity)getActivity();
+
         File f = new File(activity.getCurrentPhotoPath());
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
@@ -227,34 +277,6 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         dispatchTakePictureIntent();
     }
 
-    /**
-     * Scale the photo down and fit it to our image views.
-     *
-     * "Drastically increases performance" to set images using this technique.
-     * Read more:http://developer.android.com/training/camera/photobasics.html
-     */
-    private void setFullImageFromFilePath(String imagePath, ImageView imageView) {
-        // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
 
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imagePath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, bmOptions);
-        imageView.setImageBitmap(bitmap);
-    }
 
 }

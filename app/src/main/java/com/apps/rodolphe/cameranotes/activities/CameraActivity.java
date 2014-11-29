@@ -54,7 +54,7 @@ public class CameraActivity extends ActionBarActivity {
             savedInstanceState.putString(CAPTURED_PHOTO_PATH_KEY, mCurrentPhotoPath);
         }
         if (mCapturedImageURI != null) {
-            savedInstanceState.putString(CAPTURED_PHOTO_URI_KEY, mCapturedImageURI.toString());
+            savedInstanceState.putString(CAPTURED_PHOTO_URI_KEY, mCapturedImageURI.getPath());
         }
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -89,4 +89,10 @@ public class CameraActivity extends ActionBarActivity {
     public void setCapturedImageURI(Uri mCapturedImageURI) {
         this.mCapturedImageURI = mCapturedImageURI;
     }
+
+    /**
+     * Handle Incoming messages from contained fragments.
+     */
+
+
 }

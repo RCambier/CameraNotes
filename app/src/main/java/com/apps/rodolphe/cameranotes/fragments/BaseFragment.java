@@ -53,5 +53,6 @@ public class BaseFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
         public void onFragmentInteraction(String id);
         public void onFragmentInteraction(int actionId);
+        public void onFragmentInteractionReplace(String value);
     }
 }

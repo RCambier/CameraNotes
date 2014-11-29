@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="CameraNote"
         android:textSize="25sp"
-        android:layout_gravity="center"
+        android:layout_gravity="left"
         android:id="@+id/toolbar_title" />
 
 
