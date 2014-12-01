@@ -52,7 +52,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
 
     OnFragmentInteractionListener mCallback;
 
-
+    private ArrayAdapter adapter;
 
     public PlaceholderFragment() {
         super();
@@ -95,7 +95,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
 
         values = datasource.getAllPaths();
 
-        final ArrayAdapter adapter = new StableArrayAdapter(getActivity(),
+        adapter = new StableArrayAdapter(getActivity(),
                 R.layout.row_layout, values,activity,this);
         lv.setAdapter(adapter);
 
@@ -216,18 +216,33 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         } else if (requestCode == 22222 && resultCode == Activity.RESULT_OK) {
             addPhotoToGallery();
 
-            Log.e("FRAGMENT","INSIDE ONACTIVITYRESULT");
+            Log.e("FRAGMENT","INSIDE ONACTIVITYRESULT ROW VIEW = " + rowPosition);
             // Show the full sized image.
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mImageView);
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mThumbnailImageView);
             // add to database
 
 
-            datasource.createShape(activity.getCurrentPhotoPath(),rowPosition);
+            datasource.createShape(activity.getCurrentPhotoPath(),rowPosition+1);
 
             values = datasource.getAllPaths();
 
+            final ArrayAdapter adapter = new StableArrayAdapter(getActivity(),
+                    R.layout.row_layout, values,activity,this);
+            lv.setAdapter(adapter);
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+                @Override
+                public void onItemClick(AdapterView<?> parent, final View view,
+                                        int position, long id) {
+
+                    Log.e("values.get(0)",values.get(0).getPath());
+                    mCallback.onFragmentInteractionReplace(values.get(position).getPath());
+
+
+                }
+
+            });
 
 
         }
