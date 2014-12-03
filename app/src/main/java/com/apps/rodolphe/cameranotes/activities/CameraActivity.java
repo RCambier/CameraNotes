@@ -43,10 +43,13 @@ public class CameraActivity extends ActionBarActivity {
     // Storage for camera image URI components
     private final static String CAPTURED_PHOTO_PATH_KEY = "mCurrentPhotoPath";
     private final static String CAPTURED_PHOTO_URI_KEY = "mCapturedImageURI";
+    private final static String CAPTURED_PHOTO_POS_KEY = "mCapturedPhotoPos";
+
 
     // Required for camera operations in order to save the image file on resume.
     private String mCurrentPhotoPath = null;
     private Uri mCapturedImageURI = null;
+    private int mCapturedPhotoPos = -1 ;
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -55,6 +58,9 @@ public class CameraActivity extends ActionBarActivity {
         }
         if (mCapturedImageURI != null) {
             savedInstanceState.putString(CAPTURED_PHOTO_URI_KEY, mCapturedImageURI.getPath());
+        }
+        if (mCapturedPhotoPos != -1) {
+            savedInstanceState.putInt(CAPTURED_PHOTO_POS_KEY, mCapturedPhotoPos);
         }
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -66,6 +72,9 @@ public class CameraActivity extends ActionBarActivity {
         }
         if (savedInstanceState.containsKey(CAPTURED_PHOTO_URI_KEY)) {
             mCapturedImageURI = Uri.parse(savedInstanceState.getString(CAPTURED_PHOTO_URI_KEY));
+        }
+        if (savedInstanceState.containsKey(CAPTURED_PHOTO_POS_KEY)) {
+            mCapturedPhotoPos = savedInstanceState.getInt(CAPTURED_PHOTO_POS_KEY);
         }
         super.onRestoreInstanceState(savedInstanceState);
     }
@@ -90,6 +99,13 @@ public class CameraActivity extends ActionBarActivity {
         this.mCapturedImageURI = mCapturedImageURI;
     }
 
+    public int getCapturedPhotoPos() {
+        return mCapturedPhotoPos;
+    }
+
+    public void setCapturedPhotoPos(int mCapturedPhotoPos) {
+        this.mCapturedPhotoPos = mCapturedPhotoPos;
+    }
     /**
      * Handle Incoming messages from contained fragments.
      */

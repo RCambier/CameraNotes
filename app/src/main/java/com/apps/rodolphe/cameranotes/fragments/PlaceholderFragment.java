@@ -38,7 +38,6 @@ import java.util.List;
 public class PlaceholderFragment extends BaseFragment implements Button.OnClickListener, CameraInterface {
 
     CameraActivity activity;
-    int rowPosition;
     ListView lv;
     private PathsDataSource datasource;
     List<Path> values;
@@ -50,7 +49,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
     private ImageView mImageView;
     private ImageView mThumbnailImageView;
 
-    OnFragmentInteractionListener mCallback;
+    OnFragmentInteractionListener mCallback = null;
 
     private ArrayAdapter adapter;
 
@@ -65,7 +64,9 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mCallback = (OnFragmentInteractionListener) activity;
+            if(mCallback == null) {
+                mCallback = (OnFragmentInteractionListener) activity;
+            }
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
@@ -76,8 +77,8 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
 
+                             Bundle savedInstanceState) {
         Log.e("ONCREATEVIEW","");
 
         activity = (CameraActivity) getActivity();
@@ -132,7 +133,8 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
      */
     public void dispatchTakePictureIntent(int request, int pos) {
 
-        this.rowPosition = pos;
+        Log.e("FRAGMENT","INSIDE DISPATCHTAKENPICTUREINTENT ROW VIEW = " + pos);
+
         // Check if there is a camera.
         Context context = getActivity();
         PackageManager packageManager = context.getPackageManager();
@@ -165,6 +167,7 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
                 Uri fileUri = Uri.fromFile(photoFile);
                 activity.setCapturedImageURI(fileUri);
                 activity.setCurrentPhotoPath(fileUri.getPath());
+                activity.setCapturedPhotoPos(pos);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         activity.getCapturedImageURI());
                 startActivityForResult(takePictureIntent, request);
@@ -216,14 +219,15 @@ public class PlaceholderFragment extends BaseFragment implements Button.OnClickL
         } else if (requestCode == 22222 && resultCode == Activity.RESULT_OK) {
             addPhotoToGallery();
 
-            Log.e("FRAGMENT","INSIDE ONACTIVITYRESULT ROW VIEW = " + rowPosition);
             // Show the full sized image.
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mImageView);
             //setFullImageFromFilePath(activity.getCurrentPhotoPath(), mThumbnailImageView);
             // add to database
 
+            int position = activity.getCapturedPhotoPos();
+            Log.e("FRAGMENT","INSIDE ONACTIVITYRESULT ROW VIEW = " + position);
 
-            datasource.createShape(activity.getCurrentPhotoPath(),rowPosition+1);
+            datasource.createShape(activity.getCurrentPhotoPath(),position+1);
 
             values = datasource.getAllPaths();
 

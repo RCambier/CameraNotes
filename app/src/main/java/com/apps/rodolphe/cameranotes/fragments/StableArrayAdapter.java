@@ -1,6 +1,7 @@
 package com.apps.rodolphe.cameranotes.fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.apps.rodolphe.cameranotes.database.PathsDataSource;
 import com.apps.rodolphe.cameranotes.other.CameraInterface;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import java.util.List;
 
@@ -76,9 +78,10 @@ public class StableArrayAdapter extends ArrayAdapter<Path>{
         values = datasource.getAllPaths();
 
         options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true) // default
-                .cacheInMemory(true)
+                .showImageOnLoading(R.drawable.loading)
+                .bitmapConfig(Bitmap.Config.RGB_565)
                 .considerExifParams(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
 
         String pathImage = values.get(position).getPath();

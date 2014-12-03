@@ -24,7 +24,8 @@ public class MainActivity extends CameraActivity implements  BaseFragment.OnFrag
         super.onCreate(savedInstanceState);
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
-
+        .threadPoolSize(5)
+        .memoryCacheSize(1048576 * 10)
         .build();
 
 

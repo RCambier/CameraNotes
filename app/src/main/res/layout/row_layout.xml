@@ -3,42 +3,54 @@
 android:layout_width="match_parent"
 android:layout_height="wrap_content">
 
-<LinearLayout
+<RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="140dp"
     android:layout_marginLeft="12dp"
     android:layout_marginRight="12dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
     android:orientation="horizontal"
-    android:background="@drawable/bg_card">
+    android:background="@drawable/bg_card"
+    android:descendantFocusability="blocksDescendants">
+
+    <ImageView
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:id="@+id/shape"
+        android:scaleType="centerCrop"/>
 
     <!-- Card Contents go here -->
     <ImageView
-        android:layout_height="90dp"
-        android:layout_width="90dp"
-        android:id="@+id/rowpic" />
+        android:layout_height="70dp"
+        android:layout_width="70dp"
+        android:padding="5dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginBottom="3dp"
+        android:cropToPadding="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/rowpic"
+        android:scaleType="centerCrop"
+        android:background="@android:color/white"/>
 
-    <ImageView
-        android:layout_height="90dp"
-        android:layout_width="90dp"
-        android:id="@+id/shape" />
+
 
     <ImageButton
-        android:textSize="35sp"
         android:id="@+id/rowbutton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:layout_width="90dp"
         android:layout_height="fill_parent"
         style="?android:attr/borderlessButtonStyle"
         android:src="@drawable/add"
-        android:background="@drawable/flat_button"
+        android:background="@drawable/flat_button_row"
         android:scaleType="fitCenter"
+        android:layout_alignParentRight="true"
+        android:focusableInTouchMode="true"
+
         />
 
 
 
-</LinearLayout>
+</RelativeLayout>
 
 </FrameLayout>
